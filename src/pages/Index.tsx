@@ -1,4 +1,6 @@
 import { useState, useMemo } from 'react';
+import { Navigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
 import { usePasswords } from '@/hooks/usePasswords';
 import { Header } from '@/components/Header';
 import { SearchBar } from '@/components/SearchBar';
@@ -6,6 +8,7 @@ import { PasswordCard } from '@/components/PasswordCard';
 import { AddPasswordModal } from '@/components/AddPasswordModal';
 import { EmptyState } from '@/components/EmptyState';
 import { PasswordEntry } from '@/types/password';
+import { Shield, Loader2 } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,7 +21,8 @@ import {
 } from '@/components/ui/alert-dialog';
 
 const Index = () => {
-  const { passwords, addPassword, updatePassword, deletePassword, searchPasswords } = usePasswords();
+  const { user, isLoading: authLoading } = useAuth();
+  const { passwords, isLoading: passwordsLoading, addPassword, updatePassword, deletePassword, searchPasswords } = usePasswords(user?.id);
   const [searchQuery, setSearchQuery] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [editEntry, setEditEntry] = useState<PasswordEntry | null>(null);
@@ -29,23 +33,37 @@ const Index = () => {
     [passwords, searchQuery]
   );
 
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center animate-pulse">
+          <Shield className="w-5 h-5 text-primary" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/auth" replace />;
+  }
+
   const handleEdit = (entry: PasswordEntry) => {
     setEditEntry(entry);
     setModalOpen(true);
   };
 
-  const handleSave = (data: Omit<PasswordEntry, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const handleSave = async (data: Omit<PasswordEntry, 'id' | 'createdAt' | 'updatedAt'>) => {
     if (editEntry) {
-      updatePassword(editEntry.id, data);
+      await updatePassword(editEntry.id, data);
     } else {
-      addPassword(data);
+      await addPassword(data);
     }
     setEditEntry(null);
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (deleteId) {
-      deletePassword(deleteId);
+      await deletePassword(deleteId);
       setDeleteId(null);
     }
   };
@@ -60,6 +78,7 @@ const Index = () => {
       <Header
         passwordCount={passwords.length}
         onAddClick={() => setModalOpen(true)}
+        userEmail={user.email}
       />
 
       <main className="max-w-lg mx-auto px-4 py-6 pb-24">
@@ -67,7 +86,11 @@ const Index = () => {
           <SearchBar value={searchQuery} onChange={setSearchQuery} />
         </div>
 
-        {filteredPasswords.length === 0 ? (
+        {passwordsLoading ? (
+          <div className="flex items-center justify-center py-16">
+            <Loader2 className="w-8 h-8 text-primary animate-spin" />
+          </div>
+        ) : filteredPasswords.length === 0 ? (
           <EmptyState searchQuery={searchQuery} />
         ) : (
           <div className="space-y-3">
