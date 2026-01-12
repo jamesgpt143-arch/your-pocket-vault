@@ -12,6 +12,7 @@ interface PasswordCardProps {
 
 export function PasswordCard({ entry, onEdit, onDelete }: PasswordCardProps) {
   const [showPassword, setShowPassword] = useState(false);
+  const isNotesOnly = entry.category === 'notes';
 
   const copyToClipboard = async (text: string, label: string) => {
     try {
@@ -45,7 +46,9 @@ export function PasswordCard({ entry, onEdit, onDelete }: PasswordCardProps) {
                 </a>
               )}
             </div>
-            <p className="text-sm text-muted-foreground truncate">{entry.username}</p>
+            {!isNotesOnly && (
+              <p className="text-sm text-muted-foreground truncate">{entry.username}</p>
+            )}
           </div>
         </div>
 
@@ -69,39 +72,51 @@ export function PasswordCard({ entry, onEdit, onDelete }: PasswordCardProps) {
         </div>
       </div>
 
-      <div className="mt-4 flex items-center gap-2">
-        <div className="flex-1 bg-muted rounded-lg px-3 py-2 font-mono text-sm">
-          {showPassword ? entry.password : maskedPassword}
+      {/* Show notes for notes-only entries */}
+      {isNotesOnly && entry.notes && (
+        <div className="mt-4 bg-muted rounded-lg px-3 py-2 text-sm">
+          <p className="text-muted-foreground whitespace-pre-wrap">{entry.notes}</p>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-9 w-9 shrink-0"
-          onClick={() => setShowPassword(!showPassword)}
-        >
-          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-9 w-9 shrink-0"
-          onClick={() => copyToClipboard(entry.password, 'Password')}
-        >
-          <Copy className="w-4 h-4" />
-        </Button>
-      </div>
+      )}
 
-      <div className="mt-2 flex items-center gap-2">
-        <Button
-          variant="secondary"
-          size="sm"
-          className="text-xs h-7"
-          onClick={() => copyToClipboard(entry.username, 'Username')}
-        >
-          <Copy className="w-3 h-3 mr-1" />
-          Copy username
-        </Button>
-      </div>
+      {/* Show password section for non-notes entries */}
+      {!isNotesOnly && (
+        <>
+          <div className="mt-4 flex items-center gap-2">
+            <div className="flex-1 bg-muted rounded-lg px-3 py-2 font-mono text-sm">
+              {showPassword ? entry.password : maskedPassword}
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-9 w-9 shrink-0"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-9 w-9 shrink-0"
+              onClick={() => copyToClipboard(entry.password, 'Password')}
+            >
+              <Copy className="w-4 h-4" />
+            </Button>
+          </div>
+
+          <div className="mt-2 flex items-center gap-2">
+            <Button
+              variant="secondary"
+              size="sm"
+              className="text-xs h-7"
+              onClick={() => copyToClipboard(entry.username, 'Username')}
+            >
+              <Copy className="w-3 h-3 mr-1" />
+              Copy username
+            </Button>
+          </div>
+        </>
+      )}
     </div>
   );
 }

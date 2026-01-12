@@ -17,6 +17,7 @@ export type PasswordCategory =
   | 'shopping'
   | 'work'
   | 'entertainment'
+  | 'notes'
   | 'other';
 
 export const categoryIcons: Record<PasswordCategory, string> = {
@@ -26,15 +27,17 @@ export const categoryIcons: Record<PasswordCategory, string> = {
   shopping: '🛒',
   work: '💼',
   entertainment: '🎮',
+  notes: '📝',
   other: '🔐',
 };
 
 export const categoryLabels: Record<PasswordCategory, string> = {
   social: 'Social Media',
-  email: 'Email',
+  email: 'Email Only',
   banking: 'Banking',
   shopping: 'Shopping',
   work: 'Work',
   entertainment: 'Entertainment',
+  notes: 'Notes Only',
   other: 'Other',
 };
