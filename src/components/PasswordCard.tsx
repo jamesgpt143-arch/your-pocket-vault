@@ -8,9 +8,10 @@ interface PasswordCardProps {
   entry: PasswordEntry;
   onEdit: (entry: PasswordEntry) => void;
   onDelete: (id: string) => void;
+  onView: (entry: PasswordEntry) => void;
 }
 
-export function PasswordCard({ entry, onEdit, onDelete }: PasswordCardProps) {
+export function PasswordCard({ entry, onEdit, onDelete, onView }: PasswordCardProps) {
   const [showPassword, setShowPassword] = useState(false);
   const isNotesOnly = entry.category === 'notes';
 
@@ -26,7 +27,10 @@ export function PasswordCard({ entry, onEdit, onDelete }: PasswordCardProps) {
   const maskedPassword = '•'.repeat(Math.min(entry.password.length, 16));
 
   return (
-    <div className="vault-card animate-fade-in group hover:glow-border transition-all duration-300">
+    <div 
+      className="vault-card animate-fade-in group hover:glow-border transition-all duration-300 cursor-pointer"
+      onClick={() => onView(entry)}
+    >
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0 flex-1">
           <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center text-xl shrink-0">
@@ -41,6 +45,7 @@ export function PasswordCard({ entry, onEdit, onDelete }: PasswordCardProps) {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-muted-foreground hover:text-primary transition-colors"
+                  onClick={(e) => e.stopPropagation()}
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
                 </a>
@@ -52,7 +57,7 @@ export function PasswordCard({ entry, onEdit, onDelete }: PasswordCardProps) {
           </div>
         </div>
 
-        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
           <Button
             variant="ghost"
             size="icon"
@@ -74,15 +79,15 @@ export function PasswordCard({ entry, onEdit, onDelete }: PasswordCardProps) {
 
       {/* Show notes for notes-only entries */}
       {isNotesOnly && entry.notes && (
-        <div className="mt-4 bg-muted rounded-lg px-3 py-2 text-sm">
-          <p className="text-muted-foreground whitespace-pre-wrap">{entry.notes}</p>
+        <div className="mt-4 bg-muted rounded-lg px-3 py-2 text-sm" onClick={(e) => e.stopPropagation()}>
+          <p className="text-muted-foreground whitespace-pre-wrap line-clamp-3">{entry.notes}</p>
         </div>
       )}
 
       {/* Show password section for non-notes entries */}
       {!isNotesOnly && (
         <>
-          <div className="mt-4 flex items-center gap-2">
+          <div className="mt-4 flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
             <div className="flex-1 bg-muted rounded-lg px-3 py-2 font-mono text-sm">
               {showPassword ? entry.password : maskedPassword}
             </div>
@@ -104,7 +109,7 @@ export function PasswordCard({ entry, onEdit, onDelete }: PasswordCardProps) {
             </Button>
           </div>
 
-          <div className="mt-2 flex items-center gap-2">
+          <div className="mt-2 flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
             <Button
               variant="secondary"
               size="sm"
