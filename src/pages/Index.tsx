@@ -6,6 +6,7 @@ import { Header } from '@/components/Header';
 import { SearchBar } from '@/components/SearchBar';
 import { PasswordCard } from '@/components/PasswordCard';
 import { AddPasswordModal } from '@/components/AddPasswordModal';
+import { PasswordDetailModal } from '@/components/PasswordDetailModal';
 import { EmptyState } from '@/components/EmptyState';
 import { PasswordEntry } from '@/types/password';
 import { Shield, Loader2 } from 'lucide-react';
@@ -27,6 +28,7 @@ const Index = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [editEntry, setEditEntry] = useState<PasswordEntry | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [viewEntry, setViewEntry] = useState<PasswordEntry | null>(null);
 
   const filteredPasswords = useMemo(
     () => searchPasswords(searchQuery),
@@ -103,6 +105,7 @@ const Index = () => {
                   entry={entry}
                   onEdit={handleEdit}
                   onDelete={setDeleteId}
+                  onView={setViewEntry}
                 />
               </div>
             ))}
@@ -115,6 +118,12 @@ const Index = () => {
         onOpenChange={handleModalClose}
         onSave={handleSave}
         editEntry={editEntry}
+      />
+
+      <PasswordDetailModal
+        entry={viewEntry}
+        open={!!viewEntry}
+        onOpenChange={(open) => !open && setViewEntry(null)}
       />
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
